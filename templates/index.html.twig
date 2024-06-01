@@ -1,0 +1,156 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <style>
+        body {
+            background-color: #f0f0f0;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #metrics, #tree {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 4rem auto;
+            padding: 2rem;
+            width: 80%;
+        }
+
+        #tree {
+            height: 40vh;
+            overflow: scroll;
+        }
+
+        .reset-button {
+            margin: 2rem auto;
+            text-align: center;
+            width: 40%;
+        }
+
+        .reset-button a {
+            background-color: #007bff;
+            border-radius: 5px;
+            color: #fff;
+            display: inline-block;
+            padding: 1rem 2rem;
+            text-decoration: none;
+        }
+
+        .reset-button a:hover {
+            background-color: #0056b3;
+        }
+
+        #treeContainer {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        svg {
+            border: 1px solid #ccc;
+            transform: rotate(180deg);
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var tree = document.getElementById('tree');
+            var metrics = document.getElementById('metrics');
+
+            var updateTree = function() {
+                fetch('/grow')
+                    .then(function(response) {
+                        return response.json();
+                    })
+                    .then(function(data) {
+                        metrics.innerHTML = `
+                            <h2>Metrics</h2>
+                            <p>Height (length of one way from root to top): <b>${data.metrics.tree_height}m</b></p>
+                            <p>Size (sum of all branches length): <b>${data.metrics.tree_size}m</b></p>
+                            <p>Branches (number of branches): <b>${data.metrics.branch_number}</b></p>
+                            <p>Leaves (number of leaves): <b>${data.metrics.leaf_number}</b></p>
+                        `;
+
+                        const svg = document.getElementById('treeSVG');
+                        svg.innerHTML = '';
+                        const width = svg.getAttribute('width');
+
+                        function drawBranch(branch, startX, startY, angle, lengthScale) {
+                            const branchLength = branch.length * lengthScale;
+                            const endX = startX + branchLength * Math.cos(angle);
+                            const endY = startY - branchLength * Math.sin(angle);
+
+                            const branchLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                            branchLine.setAttribute('x1', startX);
+                            branchLine.setAttribute('y1', startY);
+                            branchLine.setAttribute('x2', endX);
+                            branchLine.setAttribute('y2', endY);
+                            branchLine.setAttribute('stroke', 'brown');
+                            branchLine.setAttribute('stroke-width', 2);
+                            svg.appendChild(branchLine);
+
+                            branch.leaves.forEach(leaf => {
+                                const leafCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                                const leafPosition = leaf.position * lengthScale;
+                                const cx = startX + leafPosition * Math.cos(angle);
+                                const cy = startY - leafPosition * Math.sin(angle);
+                                leafCircle.setAttribute('cx', cx);
+                                leafCircle.setAttribute('cy', cy);
+                                leafCircle.setAttribute('r', leaf.size);
+                                leafCircle.setAttribute('fill', 'green');
+                                svg.appendChild(leafCircle);
+                            });
+
+                            const nextAngleDelta = Math.PI / 6;
+                            const nextLengthScale = lengthScale * 0.8;
+
+                            branch.nextBranches.forEach((nextBranch, index) => {
+                                const nextAngle = angle + (index === 0 ? -nextAngleDelta : nextAngleDelta);
+                                drawBranch(nextBranch, endX, endY, nextAngle, nextLengthScale);
+                            });
+                        }
+
+                        function drawTree(treeData) {
+                            const root = treeData.root;
+                            const startX = width / 2;
+                            const startY = 0;
+                            const initialAngle = -Math.PI / 2;
+                            const initialLengthScale = 20;
+
+                            drawBranch(root, startX, startY, initialAngle, initialLengthScale);
+                        }
+
+                        drawTree(data.tree);
+
+                        tree.innerHTML = `
+                            <h2>Tree</h2>
+                            <pre>${JSON.stringify(data.tree, null, 2)}</pre>
+                        `;
+                        
+                });
+            };
+
+            updateTree();
+            setInterval(updateTree, 1000);
+        });
+    </script>
+{% endblock %}
+
+{% block body %}
+<div id="treeContainer">
+        <svg id="treeSVG" width="1000" height="800"></svg>
+    </div>
+
+    <div class="reset-button">
+        <a href="{{ path('reset_session') }}">Grow a new Tree!</a>
+    </div>
+
+    <div id="metrics">
+    </div>
+
+    <div id="tree">
+    </div>
+{% endblock %}
