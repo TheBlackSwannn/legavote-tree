@@ -48,7 +48,7 @@ Initialement l’arbre à une taille de 5 cm.
 _Note : Pour réaliser les étapes suivantes, assurez vous d'avoir PHP 8.2 ou supérieur, Composer, et Symfony CLI sur votre machine. En cas de problèmes, vous trouverez plus de détails sur la [documentation de Symfony](https://symfony.com/doc/current/setup.html#creating-symfony-applications)._
 
 1. Cloner le repo sur votre machine locale.
-2. Aller dans le dossier du projet et éxecuter `composer install`.
+2. Aller dans le dossier du projet et éxecuter `composer update`.
 3. Démarrer le serveur Symfony avec `symfony server:start`.
 4. Ouvrir un navigateur et aller à l'addresse [http://localhost:8000/](http://localhost:8000/) (le port peut être différent si cette adresse est déjà utilisée).
 5. Pour arrêter le serveur, faire `Ctrl+C` dans le terminal puis `symfony server:stop`.
