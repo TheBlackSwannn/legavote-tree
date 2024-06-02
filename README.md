@@ -2,6 +2,8 @@
 
 Cette application a été réalisée dans le cadre du test technique pour Legavote.
 
+⏱️ Temps passé : ~ 5h
+
 ## 📋 Enoncé
 
 Les branches d’un arbre grandissent toutes les secondes de 1 cm. Arrivée à une longueur de 8 cm, une branche se scinde en deux nouvelles branches.
@@ -49,7 +51,7 @@ _Note : Pour réaliser les étapes suivantes, assurez vous d'avoir PHP 8.2 ou su
 2. Aller dans le dossier du projet et éxecuter `composer install`.
 3. Démarrer le serveur Symfony avec `symfony server:start`.
 4. Ouvrir un navigateur et aller à l'addresse [http://localhost:8000/](http://localhost:8000/) (le port peut être différent si cette adresse est déjà utilisée).
-5. Pour arrêter le serveur, faire `Ctrl+C` puis `symfony server:stop`.
+5. Pour arrêter le serveur, faire `Ctrl+C` dans le terminal puis `symfony server:stop`.
 
 ## 📸 Screenshots
 
